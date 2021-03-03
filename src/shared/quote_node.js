@@ -227,7 +227,7 @@ function tryTranspile(elem) {
         let str = node.textContent;
         
         let arr = sanitizer(str);
-        console.log(elem, node,arr)
+        // console.log(elem, node,arr)
         if (arr.length == 1) {
             // node.lang = arr[0].lang;
             // elem.lang = arr[0].lang;

@@ -704,10 +704,10 @@ function tryTranspile(elem) {
         let str = node.textContent;
         
         let arr = sanitizer(str);
-        console.log(elem, node,arr)
+        // console.log(elem, node,arr)
         if (arr.length == 1) {
-            node.lang = arr[0].lang;
-            elem.lang = arr[0].lang;
+            // node.lang = arr[0].lang;
+            // elem.lang = arr[0].lang;
             if (arr[0].lang == "zh") {
                 // 由于不插入新子节点，因此直接修改该元素
                 if (!parentFontFamily.includes('"Chinese Quote",')) {
@@ -729,6 +729,7 @@ function tryTranspile(elem) {
             // newNode.lang = arr[i].lang;
             if (arr[i].lang == "zh") {
                 // 算了吧还是别处理洋文了少改 css 嚄
+                // 我愛複製粘貼
                 if (!parentFontFamily.includes('"Chinese Quote",')) {
                     newNode.style.fontFamily = '"Chinese Quote",' + parentFontFamily;
                 }
