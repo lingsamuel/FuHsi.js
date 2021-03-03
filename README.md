@@ -16,6 +16,8 @@ Forked from [空格之神](https://github.com/vinta/pangu.js)。
 
 沒有解析 `div` 和 `a`，因爲它們實在太多了。再說了不把文本放在 h 或者 p 裏的網站你是想干三洨？
 
+只支援網頁，需要支持 `@font-face`。
+
 ## Installation
 
 從 Chrome 中自行安裝。
