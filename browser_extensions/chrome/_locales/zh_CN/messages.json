@@ -1,6 +1,6 @@
 {
     "extension_name": {
-        "message": "为什么你们就是不能加个空格呢？",
+        "message": "给我好好渲染引号",
         "description": ""
     },
     "extension_description": {
@@ -44,7 +44,7 @@
         "description": ""
     },
     "god_of_spacing": {
-        "message": "空格之神",
+        "message": "引号之神",
         "description": ""
     },
     "call_god_of_spacing": {

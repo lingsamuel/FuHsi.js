@@ -137,6 +137,9 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
   var _require = __webpack_require__(1),
       Pangu = _require.Pangu;
 
+  var _require2 = __webpack_require__(2),
+      QuoteNode = _require2.QuoteNode;
+
   function once(func) {
     var _this = this,
         _arguments = arguments;
@@ -189,265 +192,30 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
       _classCallCheck(this, BrowserPangu);
 
       _this3 = _possibleConstructorReturn(this, _getPrototypeOf(BrowserPangu).call(this));
-      _this3.blockTags = /^(div|p|h1|h2|h3|h4|h5|h6)$/i;
-      _this3.ignoredTags = /^(script|code|pre|textarea)$/i;
-      _this3.presentationalTags = /^(b|code|del|em|i|s|strong|kbd)$/i;
-      _this3.spaceLikeTags = /^(br|hr|i|img|pangu)$/i;
-      _this3.spaceSensitiveTags = /^(a|del|pre|s|strike|u)$/i;
       _this3.isAutoSpacingPageExecuted = false;
       return _this3;
     }
 
     _createClass(BrowserPangu, [{
-      key: "isContentEditable",
-      value: function isContentEditable(node) {
-        return node.isContentEditable || node.getAttribute && node.getAttribute('g_editable') === 'true';
-      }
-    }, {
-      key: "isSpecificTag",
-      value: function isSpecificTag(node, tagRegex) {
-        return node && node.nodeName && node.nodeName.search(tagRegex) >= 0;
-      }
-    }, {
-      key: "isInsideSpecificTag",
-      value: function isInsideSpecificTag(node, tagRegex) {
-        var checkCurrent = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-        var currentNode = node;
-
-        if (checkCurrent) {
-          if (this.isSpecificTag(currentNode, tagRegex)) {
-            return true;
-          }
-        }
-
-        while (currentNode.parentNode) {
-          currentNode = currentNode.parentNode;
-
-          if (this.isSpecificTag(currentNode, tagRegex)) {
-            return true;
-          }
-        }
-
-        return false;
-      }
-    }, {
-      key: "canIgnoreNode",
-      value: function canIgnoreNode(node) {
-        var currentNode = node;
-
-        if (currentNode && (this.isSpecificTag(currentNode, this.ignoredTags) || this.isContentEditable(currentNode))) {
-          return true;
-        }
-
-        while (currentNode.parentNode) {
-          currentNode = currentNode.parentNode;
-
-          if (currentNode && (this.isSpecificTag(currentNode, this.ignoredTags) || this.isContentEditable(currentNode))) {
-            return true;
-          }
-        }
-
-        return false;
-      }
-    }, {
-      key: "isFirstTextChild",
-      value: function isFirstTextChild(parentNode, targetNode) {
-        var childNodes = parentNode.childNodes;
-
-        for (var i = 0; i < childNodes.length; i++) {
-          var childNode = childNodes[i];
-
-          if (childNode.nodeType !== Node.COMMENT_NODE && childNode.textContent) {
-            return childNode === targetNode;
-          }
-        }
-
-        return false;
-      }
-    }, {
-      key: "isLastTextChild",
-      value: function isLastTextChild(parentNode, targetNode) {
-        var childNodes = parentNode.childNodes;
-
-        for (var i = childNodes.length - 1; i > -1; i--) {
-          var childNode = childNodes[i];
-
-          if (childNode.nodeType !== Node.COMMENT_NODE && childNode.textContent) {
-            return childNode === targetNode;
-          }
-        }
-
-        return false;
-      }
-    }, {
-      key: "spacingNodeByXPath",
-      value: function spacingNodeByXPath(xPathQuery, contextNode) {
-        if (!(contextNode instanceof Node) || contextNode instanceof DocumentFragment) {
-          return;
-        }
-
-        var textNodes = document.evaluate(xPathQuery, contextNode, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-        var currentTextNode;
-        var nextTextNode;
-
-        for (var i = textNodes.snapshotLength - 1; i > -1; --i) {
-          currentTextNode = textNodes.snapshotItem(i);
-
-          if (this.isSpecificTag(currentTextNode.parentNode, this.presentationalTags) && !this.isInsideSpecificTag(currentTextNode.parentNode, this.ignoredTags)) {
-            var elementNode = currentTextNode.parentNode;
-
-            if (elementNode.previousSibling) {
-              var previousSibling = elementNode.previousSibling;
-
-              if (previousSibling.nodeType === Node.TEXT_NODE) {
-                var testText = previousSibling.data.substr(-1) + currentTextNode.data.toString().charAt(0);
-                var testNewText = this.spacing(testText);
-
-                if (testText !== testNewText) {
-                  previousSibling.data = "".concat(previousSibling.data, " ");
-                }
-              }
-            }
-
-            if (elementNode.nextSibling) {
-              var nextSibling = elementNode.nextSibling;
-
-              if (nextSibling.nodeType === Node.TEXT_NODE) {
-                var _testText = currentTextNode.data.substr(-1) + nextSibling.data.toString().charAt(0);
-
-                var _testNewText = this.spacing(_testText);
-
-                if (_testText !== _testNewText) {
-                  nextSibling.data = " ".concat(nextSibling.data);
-                }
-              }
-            }
-          }
-
-          if (this.canIgnoreNode(currentTextNode)) {
-            nextTextNode = currentTextNode;
-            continue;
-          }
-
-          var newText = this.spacing(currentTextNode.data);
-
-          if (currentTextNode.data !== newText) {
-            currentTextNode.data = newText;
-          }
-
-          if (nextTextNode) {
-            if (currentTextNode.nextSibling && currentTextNode.nextSibling.nodeName.search(this.spaceLikeTags) >= 0) {
-              nextTextNode = currentTextNode;
-              continue;
-            }
-
-            var _testText2 = currentTextNode.data.toString().substr(-1) + nextTextNode.data.toString().substr(0, 1);
-
-            var _testNewText2 = this.spacing(_testText2);
-
-            if (_testNewText2 !== _testText2) {
-              var nextNode = nextTextNode;
-
-              while (nextNode.parentNode && nextNode.nodeName.search(this.spaceSensitiveTags) === -1 && this.isFirstTextChild(nextNode.parentNode, nextNode)) {
-                nextNode = nextNode.parentNode;
-              }
-
-              var currentNode = currentTextNode;
-
-              while (currentNode.parentNode && currentNode.nodeName.search(this.spaceSensitiveTags) === -1 && this.isLastTextChild(currentNode.parentNode, currentNode)) {
-                currentNode = currentNode.parentNode;
-              }
-
-              if (currentNode.nextSibling) {
-                if (currentNode.nextSibling.nodeName.search(this.spaceLikeTags) >= 0) {
-                  nextTextNode = currentTextNode;
-                  continue;
-                }
-              }
-
-              if (currentNode.nodeName.search(this.blockTags) === -1) {
-                if (nextNode.nodeName.search(this.spaceSensitiveTags) === -1) {
-                  if (nextNode.nodeName.search(this.ignoredTags) === -1 && nextNode.nodeName.search(this.blockTags) === -1) {
-                    if (nextTextNode.previousSibling) {
-                      if (nextTextNode.previousSibling.nodeName.search(this.spaceLikeTags) === -1) {
-                        nextTextNode.data = " ".concat(nextTextNode.data);
-                      }
-                    } else {
-                      if (!this.canIgnoreNode(nextTextNode)) {
-                        nextTextNode.data = " ".concat(nextTextNode.data);
-                      }
-                    }
-                  }
-                } else if (currentNode.nodeName.search(this.spaceSensitiveTags) === -1) {
-                  currentTextNode.data = "".concat(currentTextNode.data, " ");
-                } else {
-                  var panguSpace = document.createElement('pangu');
-                  panguSpace.innerHTML = ' ';
-
-                  if (nextNode.previousSibling) {
-                    if (nextNode.previousSibling.nodeName.search(this.spaceLikeTags) === -1) {
-                      nextNode.parentNode.insertBefore(panguSpace, nextNode);
-                    }
-                  } else {
-                    nextNode.parentNode.insertBefore(panguSpace, nextNode);
-                  }
-
-                  if (!panguSpace.previousElementSibling) {
-                    if (panguSpace.parentNode) {
-                      panguSpace.parentNode.removeChild(panguSpace);
-                    }
-                  }
-                }
-              }
-            }
-          }
-
-          nextTextNode = currentTextNode;
-        }
-      }
-    }, {
       key: "spacingNode",
       value: function spacingNode(contextNode) {
-        var xPathQuery = './/*/text()[normalize-space(.)]';
-
-        if (contextNode.children && contextNode.children.length === 0) {
-          xPathQuery = './/text()[normalize-space(.)]';
-        }
-
-        this.spacingNodeByXPath(xPathQuery, contextNode);
-      }
-    }, {
-      key: "spacingElementById",
-      value: function spacingElementById(idName) {
-        var xPathQuery = "id(\"".concat(idName, "\")//text()");
-        this.spacingNodeByXPath(xPathQuery, document);
-      }
-    }, {
-      key: "spacingElementByClassName",
-      value: function spacingElementByClassName(className) {
-        var xPathQuery = "//*[contains(concat(\" \", normalize-space(@class), \" \"), \"".concat(className, "\")]//text()");
-        this.spacingNodeByXPath(xPathQuery, document);
-      }
-    }, {
-      key: "spacingElementByTagName",
-      value: function spacingElementByTagName(tagName) {
-        var xPathQuery = "//".concat(tagName, "//text()");
-        this.spacingNodeByXPath(xPathQuery, document);
+        $(contextNode).find("h1, h2, h3, h4, h5, h6, p").each(function (i, elem) {
+          QuoteNode(elem);
+        });
       }
     }, {
       key: "spacingPageTitle",
-      value: function spacingPageTitle() {
-        var xPathQuery = '/html/head/title/text()';
-        this.spacingNodeByXPath(xPathQuery, document);
-      }
+      value: function spacingPageTitle() {}
     }, {
       key: "spacingPageBody",
       value: function spacingPageBody() {
-        var xPathQuery = '/html/body//*/text()[normalize-space(.)]';
-        ['script', 'style', 'textarea'].forEach(function (tag) {
-          xPathQuery = "".concat(xPathQuery, "[translate(name(..),\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\",\"abcdefghijklmnopqrstuvwxyz\")!=\"").concat(tag, "\"]");
+        var start = new Date();
+        console.log("parse start", start);
+        $("h1, h2, h3, h4, h5, h6, p").each(function (i, elem) {
+          QuoteNode(elem);
         });
-        this.spacingNodeByXPath(xPathQuery, document);
+        var end = new Date();
+        console.log("parse end", end, "take", end - start, "ms");
       }
     }, {
       key: "spacingPage",
@@ -702,6 +470,286 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
   module.exports.default = pangu;
   module.exports.Pangu = Pangu;
 });
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports) {
+
+
+// 自动处理中英文混排
+// 英文合法字符串
+function canBeEn(str) {
+    // 仅判断：数字字母、逗号、空格、斜杠、ASCII 引号，Unicode 引号，英文圆括号，英文句号，英文叹号，英文问号，英文 dash，换行，冒号
+    return str != undefined && /^[0-9a-zA-Z, //\\\'\"‘’“”\(\)\.\!\?\-\r\n\:]+$/.test(str);
+}
+
+function onlyNeutralCharacter(str) {
+    // 仅判断中立符号：
+    // 数字、空格、斜杠、Unicode 引号，换行
+    return str != undefined && /^[0-9 //\\‘’“”\r\n]+$/.test(str);
+}
+
+function hasEnLetter(str) {
+    return str != undefined && /[a-zA-Z]/g.test(str);
+}
+
+function isQuote(char) {
+    return (['\'', '\"', '‘', '’', '“', '”']).includes(char);
+}
+
+function isEnOnlyQuote(char) {
+    return (['\'', '\"']).includes(char);
+}
+
+function isOpenQuote(char) {
+    return (['‘', '“']).includes(char);
+}
+
+function isCloseQuote(char) {
+    return (['’', '”']).includes(char);
+}
+
+function isOpenDoubleQuote(char) {
+    return (['“']).includes(char);
+}
+
+function isCloseDoubleQuote(char) {
+    return (['”']).includes(char);
+}
+
+function openDoubleQuotingCn(str, index) {
+    if (index == undefined || index < 0 || index >= str.length) {
+        console.log(`Checking out of index ${index}`);
+        return false;
+    }
+    if (index > str.length - 2) {
+        // 中文引号至少要包含一个中文字符。
+        // “中”
+        return false;
+    }
+    if (isOpenDoubleQuote(str[index])) {
+        let isQuotingCn = false;
+        let i = index + 1;
+        let stack = [];
+        while (i < str.length) {
+            if (isOpenDoubleQuote(str[i])) {
+                stack.push(str[i]);
+            }
+            if (isCloseDoubleQuote(str[i])) {
+                if (stack.length > 0) {
+                    stack.pop();
+                } else {
+                    break;
+                }
+            }
+            if (!canBeEn(str[i]) && stack.length == 0) {
+                // 不是英文字符，且已经是最外层嵌套
+                isQuotingCn = true;
+                break;
+            }
+            i++;
+        }
+        return isQuotingCn;
+    }
+
+    return false;
+}
+
+function closeDoubleQuotingCn(str, index) {
+    if (index == undefined || index < 0 || index >= str.length) {
+        console.log(`Checking out of index ${index}`);
+        return false;
+    }
+    if (index < 2) {
+        // 中文引号至少要包含一个中文字符。
+        // “中”
+        return false;
+    }
+    if (isCloseDoubleQuote(str[index])) {
+        let isQuotingCn = false;
+        let i = index - 1;
+        let stack = [];
+        while (i >= 0) {
+            if (isCloseDoubleQuote(str[i])) {
+                stack.push(str[i]);
+            }
+            if (isOpenDoubleQuote(str[i])) {
+                if (stack.length > 0) {
+                    stack.pop();
+                } else {
+                    break;
+                }
+            }
+            if (!canBeEn(str[i]) && stack.length == 0) {
+                // 不是英文字符，且已经是最外层嵌套
+                isQuotingCn = true;
+                break;
+            }
+            i--;
+        }
+        return isQuotingCn;
+    }
+
+    return false;
+}
+
+// 目标 index 处若是引号，判断是不是英文引号
+// 要求临近字符需要是英文或空格（你好 “eng” 你好）=> （你好 "eng" 你好）
+function quotingEn(str, index) {
+    if (index == undefined || index < 0 || index >= str.length) {
+        console.log(`Checking out of index ${index}`);
+        return false;
+    }
+    if (!isQuote(str[index])) {
+        // 不是引号
+        return false;
+    }
+
+    // 理论上讲开引号后、闭引号前不应该跟空格。
+    if (isOpenQuote(str[index])) {
+        // 开引号后，需要是英文，并且向后遍历是否是中文引号。
+        let nextIsEN = (index == str.length - 1 || canBeEn(str[index + 1])) && !openDoubleQuotingCn(str, index);
+        return nextIsEN;
+    } else if (isCloseQuote(str[index])) {
+        // 闭引号前，需要是英文。并且向前遍历是否是中文引号。
+        let prevIsEN = (index == 0 || canBeEn(str[index - 1])) && !closeDoubleQuotingCn(str, index);
+        return prevIsEN;
+    } else if (isEnOnlyQuote(str[index])) {
+        return true;
+    }
+}
+
+function splitStringByLang(str) {
+    let arr = [];
+    let push = function(s) {
+        // 合并空格
+        if ((s.trim().length == 0 && arr.length != 0) || (arr.length == 1 && arr[0].trim().length == 0)) {
+            arr[arr.length - 1] = arr[arr.length - 1] + s
+        } else {
+            arr.push(s)
+        }
+    }
+
+    let lastStart = 0;
+    for (let i = 0; i < str.length; i++) {
+        if (canBeEn(str[i]) && // 是英文字符
+            (!isQuote(str[i]) || quotingEn(str, i))) { // 若是引号，需要是英文引号
+            if (lastStart != i) {
+                push(str.slice(lastStart, i));
+            }
+            lastStart = i;
+
+            i++;
+            while (i < str.length && canBeEn(str[i]) && // 是英文字符
+                (!isQuote(str[i]) || quotingEn(str, i))) { // 若是引号，需要是英文引号
+                i++;
+            }
+            push(str.slice(lastStart, i));
+            lastStart = i;
+        }
+    }
+    if (str.length != lastStart) {
+        push(str.slice(lastStart, str.length));
+    }
+    return arr;
+}
+
+function sanitizer(str) {
+    let arr = splitStringByLang(str);
+
+    let result = [];
+    let isEn = canBeEn(arr[0]) && hasEnLetter(arr[0]);
+    // 由于只支持中英，实际上只需要返回第一个元素的语言即可。
+    // 不过为了调用者的方便，还是算了。
+    for (let i = 0; i < arr.length; i++) {
+        // if (onlyNeutralCharacter(arr[i])) {
+        //   result.push({
+        //     lang: "",
+        //     content: arr[i],
+        //   });
+        // } else {
+        result.push({
+            lang: isEn ? "en" : "zh",
+            content: arr[i],
+        });
+        isEn = !isEn;
+        // }
+    }
+    return result;
+}
+
+
+function addSpan(lang, str) {
+    return `<span lang='${lang}'>${str}</span>`
+}
+
+function tryTranspile(elem) {
+    if (!elem.hasChildNodes()) {
+        return;
+    }
+
+    let validNodes = [
+        Node.TEXT_NODE,
+    ]
+    let validTags = [
+        "H1", "H2", "H3", "H4"
+    ];
+    let parentFontFamily = getComputedStyle(elem).fontFamily;
+    for (let n = 0; n < elem.childNodes.length; n++) {
+        let node = elem.childNodes[n];
+        if (!validNodes.includes(elem.childNodes[n].nodeType)) {
+            continue;
+        }
+
+        let str = node.textContent;
+        
+        let arr = sanitizer(str);
+        console.log(elem, node,arr)
+        if (arr.length == 1) {
+            node.lang = arr[0].lang;
+            elem.lang = arr[0].lang;
+            if (arr[0].lang == "zh") {
+                // 由于不插入新子节点，因此直接修改该元素
+                if (!parentFontFamily.includes('"Chinese Quote",')) {
+                    elem.style.fontFamily = '"Chinese Quote",' + parentFontFamily;
+                }
+            } else {
+                // 移除 en 的 Chinese Quote
+                if(parentFontFamily.includes('"Chinese Quote",')) {
+                    elem.style.fontFamily = parentFontFamily.replaceAll('"Chinese Quote",', "")
+                }
+            }
+            // 仅含一种语言
+            continue;
+        }
+        // console.log(arr)
+        let nextNode = elem.childNodes[n + 1];
+        for (let i = 0; i < arr.length; i++) {
+            let newNode = document.createElement("span");
+            // newNode.lang = arr[i].lang;
+            if (arr[i].lang == "zh") {
+                // 算了吧还是别处理洋文了少改 css 嚄
+                if (!parentFontFamily.includes('"Chinese Quote",')) {
+                    newNode.style.fontFamily = '"Chinese Quote",' + parentFontFamily;
+                }
+            } else {
+                // 移除 en 的 Chinese Quote
+                if(parentFontFamily.includes('"Chinese Quote",')) {
+                    newNode.style.fontFamily = parentFontFamily.replaceAll('"Chinese Quote",', "")
+                }
+            }
+            newNode.textContent = arr[i].content;
+            elem.insertBefore(newNode, nextNode);
+        }
+        elem.removeChild(node);
+        n = n + arr.length - 1;
+    }
+}
+
+module.exports = tryTranspile;
+module.exports.default = tryTranspile;
+module.exports.QuoteNode = tryTranspile;
+
 
 /***/ })
 /******/ ]);

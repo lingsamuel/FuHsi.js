@@ -29,11 +29,20 @@
                 "file:///*/*"
             ],
             "js": [
+                "vendors/jquery/jquery-2.1.0.min.js",
                 "vendors/pangu/pangu.min.js",
                 "js/content_script.js"
             ],
-            "run_at": "document_idle"
+            "css": [
+                "vendors/pangu/pangu.css"
+            ],
+            "run_at": "document_idle",
+            "all_frames": true
         }
+    ],
+    "web_accessible_resources": [
+        "vendors/pangu/pangu.css",
+        "vendors/pangu/fonts/*"
     ],
     "minimum_chrome_version": "26.0",
     "offline_enabled": true,
