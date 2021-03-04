@@ -247,7 +247,7 @@ function tryTranspile(elem) {
         Node.TEXT_NODE,
     ]
     let invalidSubElement = [
-        "IMG", "CODE", "Q", "TEXTAREA", "SCRIPT", "PRE"
+        "IMG", "CODE", "Q", "TEXTAREA", "SCRIPT", "PRE", "SVG", "PATH", "CANVAS", "NOSCRIPT", "FORM", "STYLE"
     ];
 
     let parentFontFamily = getComputedStyle(elem).fontFamily;
