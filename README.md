@@ -12,11 +12,9 @@ Forked from [空格之神](https://github.com/vinta/pangu.js)。
 
 ## 引號之神做了什麼
 
-解析了所有 `h1, h2, h3, h4, h5, h6, p` 元素來爲中文字元插入“Chinese Quote”字體。
+解析了所有 `h1, h2, h3, h4, h5, h6, p` 元素來爲中文字元插入 “Chinese Quote” 字體。
 
-沒有解析 `div` 和 `a`，因爲它們實在太多了。再說了不把文本放在 h 或者 p 裏的網站你是想干三洨？
-
-只支援網頁，需要支持 `@font-face`。
+只支援網頁，需要瀏覽器支持 `@font-face` 和 `unicode-range`。
 
 ## Installation
 
@@ -24,9 +22,11 @@ Forked from [空格之神](https://github.com/vinta/pangu.js)。
 
 ## Why fork this
 
-因爲我根本不懂前端，而且我好懶。
+因爲我根本不懂前端不知道如何從頭開始搞，而且空格之神已經做了一些動態加載相關的工作，再加上我好懶，不如改改能用就行了吧。
 
-此外，我沒有修改除了標題之外的文本，因爲它們實在太多了。
+## 已知問題
+
+參考 Issues。
 
 ## License
 
