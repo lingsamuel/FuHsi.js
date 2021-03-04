@@ -1,4 +1,4 @@
-# 引號之神
+# 給我好好渲染引號！
 
 Forked from [空格之神](https://github.com/vinta/pangu.js)。
 
@@ -12,7 +12,7 @@ Forked from [空格之神](https://github.com/vinta/pangu.js)。
 
 ## 引號之神做了什麼
 
-解析了所有 `h1, h2, h3, h4, h5, h6, p` 元素來爲中文字元插入 “Chinese Quote” 字體。
+解析了所有元素來爲中文字元插入 “Chinese Quote” 字體。
 
 只支援網頁，需要瀏覽器支持 `@font-face` 和 `unicode-range`。
 
