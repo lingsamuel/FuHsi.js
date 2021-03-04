@@ -18,6 +18,10 @@ function onlyNeutralCharacter(str) {
     return str != undefined && /^[0-9 //\\‘’“”\r\n]+$/.test(str);
 }
 
+function hasQuote(str) {
+    return str != undefined && /[‘’“”]/g.test(str);
+}
+
 function hasEnLetter(str) {
     return str != undefined && /[a-zA-Z]/g.test(str);
 }
@@ -270,17 +274,24 @@ function tryTranspile(elem) {
         if (n == 0 && elem.childNodes.length == 1 && arr.length == 1) {
             // node.lang = arr[0].lang;
             // elem.lang = arr[0].lang;
-            elem.style.fontFamily = autoQuote(arr[0].lang, parentFontFamily);
+            if(hasQuote(arr[0].content)){
+                elem.style.fontFamily = autoQuote(arr[0].lang, parentFontFamily);
+            }
             // 仅含一种语言
             continue;
         }
         // console.log(arr);
         let nextNode = elem.childNodes[n + 1];
         for (let i = 0; i < arr.length; i++) {
-            let newNode = document.createElement("span");
+            let newNode;
+            if(!hasQuote(arr[i].content)){
+                newNode = document.createTextNode(arr[i].content);
+            } else {
+                newNode = document.createElement("span");
+                newNode.style.fontFamily = autoQuote(arr[i].lang, parentFontFamily);
+                newNode.textContent = arr[i].content;
+            }
             // newNode.lang = arr[i].lang;
-            newNode.style.fontFamily = autoQuote(arr[i].lang, parentFontFamily);
-            newNode.textContent = arr[i].content;
             elem.insertBefore(newNode, nextNode);
         }
         elem.removeChild(node);
