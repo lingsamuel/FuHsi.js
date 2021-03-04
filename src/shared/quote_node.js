@@ -1,5 +1,11 @@
 
 // 自动处理中英文混排
+
+// 仅含空白字符
+function onlySpace(str) {
+    return str == undefined || /^[ \r\n\t]+$/.test(str);
+}
+
 // 英文合法字符串
 function canBeEn(str) {
     // 仅判断：数字字母、逗号、空格、斜杠、ASCII 引号，Unicode 引号，英文圆括号，英文句号，英文叹号，英文问号，英文 dash，换行，冒号
@@ -178,6 +184,9 @@ function splitStringByLang(str) {
 }
 
 function sanitizer(str) {
+    if (onlySpace(str)) {
+        return [];
+    }
     let arr = splitStringByLang(str);
 
     let result = [];
@@ -210,14 +219,14 @@ function addCNQuote(fontFamily) {
     if (!fontFamily.includes('"Chinese Quote",')) {
         return '"Chinese Quote",' + fontFamily;
     }
-    return fontFamily;
+    return "";
 }
 
 function rmCNQuote(fontFamily) {
     if (fontFamily.includes('"Chinese Quote",')) {
         return fontFamily.replaceAll('"Chinese Quote",', "");
     }
-    return fontFamily;
+    return "";
 }
 
 function autoQuote(lang, fontFamily) {
@@ -237,13 +246,17 @@ function tryTranspile(elem) {
     let validNodes = [
         Node.TEXT_NODE,
     ]
-    let validTags = [
-        "H1", "H2", "H3", "H4"
+    let invalidSubElement = [
+        "IMG", "CODE", "Q", "TEXTAREA"
     ];
+
     let parentFontFamily = getComputedStyle(elem).fontFamily;
     for (let n = 0; n < elem.childNodes.length; n++) {
         let node = elem.childNodes[n];
-        if (!validNodes.includes(elem.childNodes[n].nodeType)) {
+        if (elem.childNodes[n].nodeType == Node.ELEMENT_NODE && !invalidSubElement.includes(elem.childNodes[n].tagName)) {
+            tryTranspile(elem.childNodes[n]);
+            continue;
+        } else if (!validNodes.includes(elem.childNodes[n].nodeType)) {
             continue;
         }
 
@@ -251,7 +264,10 @@ function tryTranspile(elem) {
 
         let arr = sanitizer(str);
         // console.log(elem, node,arr);
-        if (arr.length == 1) {
+        if (arr.length == 0) {
+            continue;
+        }
+        if (n == 0 && elem.childNodes.length == 1 && arr.length == 1) {
             // node.lang = arr[0].lang;
             // elem.lang = arr[0].lang;
             elem.style.fontFamily = autoQuote(arr[0].lang, parentFontFamily);

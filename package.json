@@ -1,5 +1,5 @@
 {
-  "name": "pangu",
+  "name": "fuhsi",
   "description": "Paranoid text spacing for good readability, to automatically insert whitespace between CJK (Chinese, Japanese, Korean) and half-width characters (alphabetical letters, numerical digits and symbols).",
   "keywords": [
     "pangu",
@@ -17,7 +17,7 @@
     "ocd",
     "paranoia"
   ],
-  "version": "4.0.7",
+  "version": "1.0.1",
   "author": {
     "name": "Vinta Chen",
     "email": "vinta.chen@gmail.com",

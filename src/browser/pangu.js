@@ -59,7 +59,7 @@ class BrowserPangu extends Pangu {
   spacingPageBody() {
     let start = new Date();
     console.log("parse start", start)
-    $("h1, h2, h3, h4, h5, h6, p").each((i, elem) => {
+    $("body").each((i, elem) => {
       // console.log(elem)
       QuoteNode(elem);
     });
