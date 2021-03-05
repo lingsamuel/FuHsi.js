@@ -219,26 +219,32 @@ function addSpan(lang, str) {
     return `<span lang='${lang}'>${str}</span>`
 }
 
-function addCNQuote(fontFamily) {
+function addCNQuote(fontFamily, canBeEmpty) {
     if (!fontFamily.includes('"Chinese Quote",')) {
         return '"Chinese Quote",' + fontFamily;
     }
-    return "";
+    if(canBeEmpty) {
+        return "";
+    }
+    return '"Chinese Quote",' + fontFamily;
 }
 
-function rmCNQuote(fontFamily) {
+function rmCNQuote(fontFamily, canBeEmpty) {
     if (fontFamily.includes('"Chinese Quote",')) {
         return fontFamily.replaceAll('"Chinese Quote",', "");
     }
-    return "";
+    if(canBeEmpty) {
+        return "";
+    }
+    return fontFamily.replaceAll('"Chinese Quote",', "");
 }
 
-function autoQuote(lang, fontFamily) {
+function autoQuote(lang, fontFamily, canBeEmpty) {
     if (lang == "zh") {
-        return addCNQuote(fontFamily);
+        return addCNQuote(fontFamily, canBeEmpty);
     } else {
         // 移除 en 的 Chinese Quote
-        return rmCNQuote(fontFamily);
+        return rmCNQuote(fontFamily, canBeEmpty);
     }
 }
 
@@ -275,6 +281,7 @@ function tryTranspile(elem) {
             // node.lang = arr[0].lang;
             // elem.lang = arr[0].lang;
             if(hasQuote(arr[0].content)){
+                console.log(str, arr[0].lang, parentFontFamily)
                 elem.style.fontFamily = autoQuote(arr[0].lang, parentFontFamily);
             }
             // 仅含一种语言
@@ -288,7 +295,8 @@ function tryTranspile(elem) {
                 newNode = document.createTextNode(arr[i].content);
             } else {
                 newNode = document.createElement("span");
-                newNode.style.fontFamily = autoQuote(arr[i].lang, parentFontFamily);
+                console.log(str, arr[0].lang, parentFontFamily)
+                newNode.style.fontFamily = autoQuote(arr[i].lang, parentFontFamily, true);
                 newNode.textContent = arr[i].content;
             }
             // newNode.lang = arr[i].lang;
