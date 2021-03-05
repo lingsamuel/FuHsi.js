@@ -281,7 +281,7 @@ function tryTranspile(elem) {
             // node.lang = arr[0].lang;
             // elem.lang = arr[0].lang;
             if(hasQuote(arr[0].content)){
-                console.log(str, arr[0].lang, parentFontFamily)
+                // console.log(str, arr[0].lang, parentFontFamily)
                 elem.style.fontFamily = autoQuote(arr[0].lang, parentFontFamily);
             }
             // 仅含一种语言
