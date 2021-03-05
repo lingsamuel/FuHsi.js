@@ -50,6 +50,33 @@ function isCloseDoubleQuote(char) {
     return (['”']).includes(char);
 }
 
+function tryGetNextMatchDoubleQuote(str, index) {
+    if (!isOpenDoubleQuote(str[index])) {
+        return { i: -1 };;
+    }
+
+    let isQuotingCn = false;
+    let i = index + 1;
+    let stack = [];
+    while (i < str.length) {
+        if (isOpenDoubleQuote(str[i])) {
+            stack.push(str[i]);
+        }
+        if (isCloseDoubleQuote(str[i]) && stack.length == 0) {
+            if (isQuotingCn) {
+                return { lang: "zh", i: i };
+            } else {
+                return { lang: "en", i: i };
+            }
+        }
+        if (!canBeEn(str[i])) {
+            isQuotingCn = true;
+        }
+        i++;
+    }
+    return { i: -1 };
+}
+
 function openDoubleQuotingCn(str, index) {
     if (index == undefined || index < 0 || index >= str.length) {
         console.log(`Checking out of index ${index}`);
@@ -165,6 +192,15 @@ function splitStringByLang(str) {
 
     let lastStart = 0;
     for (let i = 0; i < str.length; i++) {
+        // if (isOpenDoubleQuote(str[i])) {
+        //   let matchedQuoteIndex = tryGetNextMatchDoubleQuote(str, i);
+        //   if (matchedQuoteIndex.i != -1) {
+        //     i = matchedQuoteIndex;
+        //     push(str.slice(lastStart, i));
+        //     lastStart = i;
+        //     continue;
+        //   }
+        // }
         if (canBeEn(str[i]) && // 是英文字符
             (!isQuote(str[i]) || quotingEn(str, i))) { // 若是引号，需要是英文引号
             if (lastStart != i) {
@@ -223,7 +259,7 @@ function addCNQuote(fontFamily, canBeEmpty) {
     if (!fontFamily.includes('"Chinese Quote",')) {
         return '"Chinese Quote",' + fontFamily;
     }
-    if(canBeEmpty) {
+    if (canBeEmpty) {
         return "";
     }
     return '"Chinese Quote",' + fontFamily;
@@ -233,7 +269,7 @@ function rmCNQuote(fontFamily, canBeEmpty) {
     if (fontFamily.includes('"Chinese Quote",')) {
         return fontFamily.replaceAll('"Chinese Quote",', "");
     }
-    if(canBeEmpty) {
+    if (canBeEmpty) {
         return "";
     }
     return fontFamily.replaceAll('"Chinese Quote",', "");
@@ -274,13 +310,14 @@ function tryTranspile(elem) {
 
         let arr = sanitizer(str);
         // console.log(elem, node,arr);
+        // console.log(str)
         if (arr.length == 0) {
             continue;
         }
         if (n == 0 && elem.childNodes.length == 1 && arr.length == 1) {
             // node.lang = arr[0].lang;
             // elem.lang = arr[0].lang;
-            if(hasQuote(arr[0].content)){
+            if (hasQuote(arr[0].content)) {
                 // console.log(str, arr[0].lang, parentFontFamily)
                 elem.style.fontFamily = autoQuote(arr[0].lang, parentFontFamily);
             }
@@ -291,11 +328,11 @@ function tryTranspile(elem) {
         let nextNode = elem.childNodes[n + 1];
         for (let i = 0; i < arr.length; i++) {
             let newNode;
-            if(!hasQuote(arr[i].content)){
+            if (!hasQuote(arr[i].content)) {
                 newNode = document.createTextNode(arr[i].content);
             } else {
                 newNode = document.createElement("span");
-                console.log(str, arr[0].lang, parentFontFamily)
+                // console.log(str, arr[0].lang, parentFontFamily)
                 newNode.style.fontFamily = autoQuote(arr[i].lang, parentFontFamily, true);
                 newNode.textContent = arr[i].content;
             }
